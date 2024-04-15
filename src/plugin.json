@@ -1,5 +1,11 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
+  "routes": [
+    {
+      "path": "nodegraphds",
+      "url": "{{ .jsonData.backendURL }}"
+    }
+  ],
   "type": "datasource",
   "name": "Kubearmor_datasource",
   "id": "accuknox-kubearmor-datasource",
@@ -9,7 +15,9 @@
     "author": {
       "name": "Accuknox"
     },
-    "keywords": ["datasource"],
+    "keywords": [
+      "datasource"
+    ],
     "logos": {
       "small": "img/logo.svg",
       "large": "img/logo.svg"

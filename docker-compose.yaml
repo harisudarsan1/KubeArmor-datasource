@@ -18,9 +18,41 @@ services:
       - ./provisioning:/etc/grafana/provisioning
       - .:/root/accuknox-kubearmor-datasource
 
+
     environment:
       NODE_ENV: development
       GF_LOG_FILTERS: plugin.accuknox-kubearmor-datasource:debug
       GF_LOG_LEVEL: debug
       GF_DATAPROXY_LOGGING: 1
       GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: accuknox-kubearmor-datasource
+      
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.0.1
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - discovery.type=single-node
+      - http.port=9200
+      - http.cors.enabled=true
+      - http.cors.allow-origin=http://localhost:1358,http://127.0.0.1:1358,http://localhost:3000,http://127.0.0.1:1358
+      - http.cors.allow-headers=X-Requested-With,X-Auth-Token,Content-Type,Content-Length,Authorization
+      - http.cors.allow-credentials=true
+      - bootstrap.memory_lock=true
+      - 'ES_JAVA_OPTS=-Xms512m -Xmx512m'
+    ports:
+      - '9200:9200'
+      - '9300:9300'
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+
+  # test-elastic:
+  #   image: harisudarsan/testelastic
+  #   container_name: testelastic
+  #   restart: always
+  #   ports:
+  #     - '3200:3200'
+  #   volumes:
+  #     - "./website/:/var/www/html/"
+volumes:
+  es-data:
+    driver: local

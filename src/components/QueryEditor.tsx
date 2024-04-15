@@ -8,36 +8,28 @@ type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
 
 export function QueryEditor({ query, onChange, onRunQuery }: Props) {
   const onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, queryText: event.target.value });
-  };
+    onChange({ ...query, APIquery: event.target.value });
 
-  const onConstantChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, constant: parseFloat(event.target.value) });
-    // executes the query
     onRunQuery();
   };
 
-  const { queryText, constant } = query;
+  // const onConstantChange = (event: ChangeEvent<HTMLInputElement>) => {
+  //   onChange({ ...query, constant: parseFloat(event.target.value) });
+  //   // executes the query
+  //   onRunQuery();
+  // };
+
+  const { APIquery } = query;
 
   return (
     <Stack gap={0}>
-      <InlineField label="Constant">
-        <Input
-          id="query-editor-constant"
-          onChange={onConstantChange}
-          value={constant}
-          width={8}
-          type="number"
-          step="0.1"
-        />
-      </InlineField>
-      <InlineField label="Query Text" labelWidth={16} tooltip="Not used yet">
+      <InlineField label="queries" labelWidth={16} tooltip="Enter API queries">
         <Input
           id="query-editor-query-text"
           onChange={onQueryTextChange}
-          value={queryText || ''}
+          value={APIquery || ''}
           required
-          placeholder="Enter a query"
+          placeholder="api queries"
         />
       </InlineField>
     </Stack>
