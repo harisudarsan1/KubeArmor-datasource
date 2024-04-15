@@ -1,5 +1,6 @@
 import { FrameFieldType } from "types";
 
+
 export const EdgeframeFields: FrameFieldType[] = [
   {
     name: 'id',
@@ -16,6 +17,16 @@ export const EdgeframeFields: FrameFieldType[] = [
     type: 'string',
     config: {}
   },
+]
+
+export const sampleNode_fields: FrameFieldType[] = [
+
+  {
+    name: 'id',
+    type: 'string',
+    config: {}
+  },
+
 ]
 
 export const NodeframeFields: FrameFieldType[] = [
@@ -64,11 +75,11 @@ export const NodeframeFields: FrameFieldType[] = [
     type: 'string',
     config: { displayName: 'Namespace Name' }
   },
-  {
-    name: 'detail__Owner',
-    type: 'Podowner',
-    config: { displayName: 'Owner' }
-  },
+  // {
+  //   name: 'detail__Owner',
+  //   type: 'Podowner',
+  //   config: { displayName: 'Owner' }
+  // },
   {
     name: 'detail__PodName',
     type: 'string',
@@ -169,5 +180,182 @@ export const NodeframeFields: FrameFieldType[] = [
     type: 'string',
     config: { displayName: 'TTY' }
   },
+];
+
+
+export const sample_nodes = [
+  {
+    id: 'node1',
+    title: 'Node Title 1',
+    mainStat: '120',
+    color: 'blue',
+    detail__Timestamp: 1617981123,
+    detail__UpdatedTime: '2021-04-09T12:12:03Z',
+    detail__ClusterName: 'Cluster A',
+    detail__HostName: 'Host1',
+    detail__NamespaceName: 'Namespace1',
+    detail__PodName: 'Pod1',
+    detail__Labels: 'Label1',
+    detail__ContainerID: 'c1234567890',
+    detail__ContainerName: 'Container1',
+    detail__ContainerImage: 'image1:v1',
+    detail__ParentProcessName: 'init',
+    detail__ProcessName: 'process1',
+    detail__HostPPID: 1001,
+    detail__HostPID: 1501,
+    detail__PPID: 100,
+    detail__PID: 150,
+    detail__UID: 501,
+    detail__Type: 'Service',
+    detail__Source: 'Internal',
+    detail__Operation: 'Read',
+    detail__Resource: 'Resource1',
+    detail__Data: 'Data1',
+    detail__Result: 'Success',
+    detail__Cwd: '/home/user',
+    detail__TTY: 'tty1',
+  },
+  {
+    id: 'node2',
+    title: 'Node Title 2',
+    mainStat: '130',
+    color: 'red',
+    detail__Timestamp: 1617982123,
+    detail__UpdatedTime: '2021-04-09T12:30:03Z',
+    detail__ClusterName: 'Cluster B',
+    detail__HostName: 'Host2',
+    detail__NamespaceName: 'Namespace2',
+    detail__PodName: 'Pod2',
+    detail__Labels: 'Label2',
+    detail__ContainerID: 'c1234567891',
+    detail__ContainerName: 'Container2',
+    detail__ContainerImage: 'image2:v2',
+    detail__ParentProcessName: 'systemd',
+    detail__ProcessName: 'process2',
+    detail__HostPPID: 2002,
+    detail__HostPID: 2502,
+    detail__PPID: 200,
+    detail__PID: 250,
+    detail__UID: 502,
+    detail__Type: 'App',
+    detail__Source: 'External',
+    detail__Operation: 'Write',
+    detail__Resource: 'Resource2',
+    detail__Data: 'Data2',
+    detail__Result: 'Failure',
+    detail__Cwd: '/usr/local',
+    detail__TTY: 'tty2',
+  },
+  {
+    id: 'node3',
+    title: 'Node Title 3',
+    mainStat: '140',
+    color: 'green',
+    detail__Timestamp: 1617983123,
+    detail__UpdatedTime: '2021-04-09T12:48:03Z',
+    detail__ClusterName: 'Cluster C',
+    detail__HostName: 'Host3',
+    detail__NamespaceName: 'Namespace3',
+    detail__PodName: 'Pod3',
+    detail__Labels: 'Label3',
+    detail__ContainerID: 'c1234567892',
+    detail__ContainerName: 'Container3',
+    detail__ContainerImage: 'image3:v3',
+    detail__ParentProcessName: 'upstart',
+    detail__ProcessName: 'process3',
+    detail__HostPPID: 3003,
+    detail__HostPID: 3503,
+    detail__PPID: 300,
+    detail__PID: 350,
+    detail__UID: 503,
+    detail__Type: 'Database',
+    detail__Source: 'Internal',
+    detail__Operation: 'Update',
+    detail__Resource: 'Resource3',
+    detail__Data: 'Data3',
+    detail__Result: 'Success',
+    detail__Cwd: '/opt',
+    detail__TTY: 'tty3',
+  },
+  {
+    id: 'node4',
+    title: 'Node Title 4',
+    mainStat: '150',
+    color: 'yellow',
+    detail__Timestamp: 1617984123,
+    detail__UpdatedTime: '2021-04-09T13:05:03Z',
+    detail__ClusterName: 'Cluster D',
+    detail__HostName: 'Host4',
+    detail__NamespaceName: 'Namespace4',
+    detail__PodName: 'Pod4',
+    detail__Labels: 'Label4',
+    detail__ContainerID: 'c1234567893',
+    detail__ContainerName: 'Container4',
+    detail__ContainerImage: 'image4:v4',
+    detail__ParentProcessName: 'launchd',
+    detail__ProcessName: 'process4',
+    detail__HostPPID: 4004,
+    detail__HostPID: 4504,
+    detail__PPID: 400,
+    detail__PID: 450,
+    detail__UID: 504,
+    detail__Type: 'Middleware',
+    detail__Source: 'Internal',
+    detail__Operation: 'Delete',
+    detail__Resource: 'Resource4',
+    detail__Data: 'Data4',
+    detail__Result: 'Failure',
+    detail__Cwd: '/root',
+    detail__TTY: 'tty4',
+  },
+  {
+    id: 'node5',
+    title: 'Node Title 5',
+    mainStat: '160',
+    color: 'purple',
+    detail__Timestamp: 1617985123,
+    detail__UpdatedTime: '2021-04-09T13:22:03Z',
+    detail__ClusterName: 'Cluster E',
+    detail__HostName: 'Host5',
+    detail__NamespaceName: 'Namespace5',
+    detail__PodName: 'Pod5',
+    detail__Labels: 'Label5',
+    detail__ContainerID: 'c1234567894',
+    detail__ContainerName: 'Container5',
+    detail__ContainerImage: 'image5:v5',
+    detail__ParentProcessName: 'smss',
+    detail__ProcessName: 'process5',
+    detail__HostPPID: 5005,
+    detail__HostPID: 5505,
+    detail__PPID: 500,
+    detail__PID: 550,
+    detail__UID: 505,
+    detail__Type: 'Application',
+    detail__Source: 'External',
+    detail__Operation: 'Access',
+    detail__Resource: 'Resource5',
+    detail__Data: 'Data5',
+    detail__Result: 'Success',
+    detail__Cwd: '/var',
+    detail__TTY: 'tty5',
+  }
+];
+export const sample_edges = [
+  {
+    id: 'edge1',
+    source: 'node1',
+    target: 'node2',
+  },
+  {
+    id: 'edge2',
+    source: 'node2',
+    target: 'node1',
+  },
+  {
+    id: 'edge3',
+    source: 'node3',
+    target: 'node1',
+  },
+
 ];
 

@@ -41,8 +41,8 @@ export interface NodeGraph {
 
 export interface NodeFields extends KubeArmorLogs {
   id: string;
-  title: string;
-  mainStat: string;
+  title?: string;
+  mainStat?: string;
   color?: string;
 
 }
@@ -55,32 +55,31 @@ export interface FrameFieldType {
 }
 
 export interface KubeArmorLogs {
-  detail__Timestamp: number;
-  detail__UpdatedTime: string;
-  detail__ClusterName: string;
-  detail__HostName: string;
-  detail__NamespaceName: string;
-  // detail__Owner: Podowner;
-  detail__PodName: string;
-  detail__Labels: string;
-  detail__ContainerID: string;
-  detail__ContainerName: string;
-  detail__ContainerImage: string;
-  detail__ParentProcessName: string;
-  detail__ProcessName: string;
-  detail__HostPPID: number;
-  detail__HostPID: number;
-  detail__PPID: number;
-  detail__PID: number;
-  detail__UID: number;
-  detail__Type: string;
-  detail__Source: string;
-  detail__Operation: string;
-  detail__Resource: string;
-  detail__Data: string;
-  detail__Result: string;
-  detail__Cwd: string;
-  detail__TTY: string;
+  detail__Timestamp?: number;
+  detail__UpdatedTime?: string; // Already commented out, assuming you still don't want this included
+  detail__ClusterName?: string;
+  detail__HostName?: string;
+  detail__NamespaceName?: string;
+  detail__PodName?: string;
+  detail__Labels?: string;
+  detail__ContainerID?: string;
+  detail__ContainerName?: string;
+  detail__ContainerImage?: string;
+  detail__ParentProcessName?: string;
+  detail__ProcessName?: string;
+  detail__HostPPID?: number;
+  detail__HostPID?: number;
+  detail__PPID?: number;
+  detail__PID?: number;
+  detail__UID?: number;
+  detail__Type?: string;
+  detail__Source?: string;
+  detail__Operation?: string;
+  detail__Resource?: string;
+  detail__Data?: string;
+  detail__Result?: string;
+  detail__Cwd?: string;
+  detail__TTY?: string;
 }
 
 interface Podowner {

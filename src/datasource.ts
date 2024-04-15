@@ -7,8 +7,8 @@ import {
   DataSourceInstanceSettings,
   MutableDataFrame,
 } from '@grafana/data';
-import { NodeframeFields, EdgeframeFields } from './constants';
-import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, ElasticsearchResponse, Log, Hits, NodeFields, EdgeFields, NodeGraph, HealthResponse } from './types';
+import { NodeframeFields, EdgeframeFields, } from './constants';
+import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, ElasticsearchResponse, Log, Hits, NodeFields, EdgeFields, NodeGraph, } from './types';
 import { lastValueFrom } from 'rxjs';
 import _, { defaults } from 'lodash';
 
@@ -26,7 +26,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-    const promises = options.targets.map(async target => {
+    const promises = options.targets.flatMap(async target => {
       const query = defaults(target, DEFAULT_QUERY)
       const params = getTemplateSrv().replace(query.APIquery, options.scopedVars)
       const GraphData: NodeGraph = await this.getGraphData("/_search", params)
@@ -57,6 +57,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
     })
 
+
     return Promise.all(promises).then(data => ({ data: data[0] }));
   }
 
@@ -65,71 +66,64 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       nodes: [],
       edges: []
     }
-    this.request<ElasticsearchResponse>(url, params)
-      .then(response => {
 
-        const data: ElasticsearchResponse = response.data;
-        const logs: Log[] = data.hits.hits.map((item: Hits) => item._source)
-        console.log(logs)
-        const nodes: NodeFields[] = logs.map((log: Log) => {
-          const node: NodeFields = {
-            id: `${log.HostPID}`,
-            title: log.ProcessName,
-            mainStat: log.Source,
-            detail__Timestamp: log.Timestamp,
-            detail__UpdatedTime: log.UpdatedTime,
-            detail__ClusterName: log.ClusterName,
-            detail__HostName: log.HostName,
-            detail__NamespaceName: log.NamespaceName,
-            detail__PodName: log.PodName,
-            detail__Labels: log.Labels,
-            detail__ContainerID: log.ContainerID,
-            detail__ContainerName: log.ContainerName,
-            detail__ContainerImage: log.ContainerImage,
-            detail__ParentProcessName: log.ParentProcessName,
-            detail__ProcessName: log.ProcessName,
-            detail__HostPPID: log.HostPPID,
-            detail__HostPID: log.HostPID,
-            detail__PPID: log.PPID,
-            detail__PID: log.PID,
-            detail__UID: log.UID,
-            detail__Type: log.Type,
-            detail__Source: log.Source,
-            detail__Operation: log.Operation,
-            detail__Resource: log.Resource,
-            detail__Data: log.Data,
-            detail__Result: log.Result,
-            detail__Cwd: log.Cwd,
-            detail__TTY: log.TTY,
-          }
-          return node;
+    const response = await this.request<ElasticsearchResponse>('/_search');
 
-        })
-        const edges: EdgeFields[] = logs.map(item => {
-          const edge: EdgeFields = {
-            id: `${item.HostPID}`,
-            source: `${item.HostPPID}`,
+    const data: ElasticsearchResponse = response.data;
+    const logs: Log[] = data.hits.hits.map((item: Hits) => item._source)
+    const nodes: NodeFields[] = logs.map((log: Log) => {
+      const node: NodeFields = {
+        id: `${log.HostPID}`,
+        title: log.ProcessName,
+        mainStat: log.Source,
+        detail__UpdatedTime: log.UpdatedTime,
+        detail__Timestamp: log.Timestamp,
+        detail__ClusterName: log.ClusterName,
+        detail__HostName: log.HostName,
+        detail__NamespaceName: log.NamespaceName,
+        detail__PodName: log.PodName,
+        detail__Labels: log.Labels,
+        detail__ContainerID: log.ContainerID,
+        detail__ContainerName: log.ContainerName,
+        detail__ContainerImage: log.ContainerImage,
+        detail__ParentProcessName: log.ParentProcessName,
+        detail__ProcessName: log.ProcessName,
+        detail__HostPPID: log.HostPPID,
+        detail__HostPID: log.HostPID,
+        detail__PPID: log.PPID,
+        detail__PID: log.PID,
+        detail__UID: log.UID,
+        detail__Type: log.Type,
+        detail__Source: log.Source,
+        detail__Operation: log.Operation,
+        detail__Resource: log.Resource,
+        detail__Data: log.Data,
+        detail__Result: log.Result,
+        detail__Cwd: log.Cwd,
+        detail__TTY: log.TTY,
+      }
+      return node;
 
-            target: `${item.HostPID}`,
+    })
+    const edges: EdgeFields[] = logs.map(item => {
+      const edge: EdgeFields = {
+        id: `${item.HostPID}`,
+        source: `${item.HostPPID}`,
 
-          }
-          return edge
+        target: `${item.HostPID}`,
+
+      }
+      return edge
 
 
-        })
+    })
 
-        nodeGraph = {
-          nodes: nodes,
-          edges: edges
-        }
-        return nodeGraph
-
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-        return nodeGraph
-      });
+    nodeGraph = {
+      nodes: nodes,
+      edges: edges
+    }
     return nodeGraph
+
   }
 
   getDefaultQuery(_: CoreApp): Partial<MyQuery> {
@@ -137,31 +131,9 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   filterQuery(query: MyQuery): boolean {
-    // if no query has been provided, prevent the query from being executed
     return !!query.APIquery;
   }
 
-  // async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-  //   const { range } = options;
-  //   const from = range!.from.valueOf();
-  //   const to = range!.to.valueOf();
-  //
-  //   // Return a constant for each query.
-  //   const data = options.targets.map((target) => {
-  //     return new MutableDataFrame({
-  //       refId: target.refId,
-  //       fields: [
-  //         { name: 'Time', values: [from, to], type: FieldType.time },
-  //         { name: 'Value', values: [target.constant, target.constant], type: FieldType.number },
-  //       ],
-  //     });
-
-  //
-  //   return { data };
-  // }
-  // ElasticsearchResponse
-
-  // `${this.baseUrl}${endpoint}${params?.length ? `?${params}` : ''}`,
 
   async request<T>(endpoint: string, params?: string) {
 
@@ -175,19 +147,16 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     return lastValueFrom(result);
   }
 
-  /**
-   * Checks whether we can connect to the API.
-   */
   async testDatasource() {
     const defaultErrorMessage = 'Cannot connect to API';
 
     try {
-      const response = await this.request<HealthResponse>('/_cluster/health');
+      const response = await this.request<ElasticsearchResponse>('/_search');
       if (response.status === 200) {
         return {
 
-          status: response.data.status,
-          message: `ClusterName: ${response.data.cluster_name}`,
+          status: 'sucess',
+          message: `responses: ${response.data.took} ${response.data.hits.hits.map(i => i._source.TTY)}`,
         };
       } else {
         return {
