@@ -1,13 +1,21 @@
 import { DataSourceJsonData } from '@grafana/data';
 import { DataQuery } from '@grafana/schema';
 
-export interface MyQuery extends DataQuery {
+export interface MyQuery extends DataQuery, QueryType {
   // backendURL?: string;
+}
+
+export interface QueryType {
+
   APIquery?: string;
+  NamespaceQuery?: string;
+  LabelQuery?: string;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
-  APIquery: ""
+  APIquery: "size=1000&pretty&q=TTY:pts0",
+  NamespaceQuery: "All",
+  LabelQuery: "All"
 };
 
 // export interface DataPoint {
@@ -24,6 +32,7 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
   path?: string;
+  backendName?: string;
 }
 
 /**
@@ -44,6 +53,9 @@ export interface NodeFields extends KubeArmorLogs {
   title?: string;
   mainStat?: string;
   color?: string;
+  childNode?: string;
+  nodeRadius?: string;
+  highlighted?: boolean;
 
 }
 

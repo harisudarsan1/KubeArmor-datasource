@@ -49,6 +49,16 @@ export const NodeframeFields: FrameFieldType[] = [
     name: 'color',
     type: 'string',
     config: {}
+  }, {
+    name: 'nodeRadius',
+    type: 'string',
+    config: {}
+
+  }, {
+    name: 'highlighted',
+    type: 'boolean',
+    config: {}
+
   },
   {
     name: 'detail__Timestamp',
