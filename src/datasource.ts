@@ -95,7 +95,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       const isBlocked = log.Result === "Permission denied"
       if (log.PPID === 0) {
 
-        const colorIndex = random(0, 4)
+        const colorIndex = random(0, colors.length - 1)
         const containerNode: NodeFields = {
           id: `${log.ContainerName + log.NamespaceName}`,
           title: log.ContainerName,
