@@ -1,4 +1,4 @@
-import { getBackendSrv, isFetchError, getTemplateSrv } from '@grafana/runtime';
+import { getBackendSrv, isFetchError, getTemplateSrv, } from '@grafana/runtime';
 import {
   CoreApp,
   DataQueryRequest,
@@ -8,7 +8,7 @@ import {
   MutableDataFrame,
 } from '@grafana/data';
 import { NodeframeFields, EdgeframeFields, } from './constants';
-import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, ElasticsearchResponse, Log, Hits, NodeFields, EdgeFields, NodeGraph, HealthResponse, QueryType } from './types';
+import { MyQuery, MyDataSourceOptions, DEFAULT_QUERY, ElasticsearchResponse, Log, Hits, NodeFields, EdgeFields, NodeGraph, QueryType, LokiSearchResponse, HealthResponse } from './types';
 import { lastValueFrom } from 'rxjs';
 import _, { defaults, random } from 'lodash';
 
@@ -17,27 +17,32 @@ import _, { defaults, random } from 'lodash';
 // const routePath = 'nodegraphds';
 export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   baseUrl: string;
-  isProxyAccess: boolean
+  isProxyAccess: boolean;
+  backendName: string;
 
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
     this.baseUrl = instanceSettings.url!;
     this.isProxyAccess = instanceSettings.access === 'proxy';
+    this.backendName = instanceSettings.jsonData.backendName;
   }
 
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
+
     const promises = options.targets.flatMap(async target => {
+
       const query = defaults(target, DEFAULT_QUERY)
-      const params = getTemplateSrv().replace(query.APIquery, options.scopedVars)
+      // const params = getTemplateSrv().replace(query.APIquery, options.scopedVars)
       const filterNamespace = getTemplateSrv().replace(query.NamespaceQuery, options.scopedVars)
       const filterLabels = getTemplateSrv().replace(query.LabelQuery, options.scopedVars)
+      const filterOperations = getTemplateSrv().replace(query.Operation, options.scopedVars)
       const myquery: QueryType = {
-        APIquery: params,
         NamespaceQuery: filterNamespace,
-        LabelQuery: filterLabels
+        LabelQuery: filterLabels,
+        Operation: filterOperations
 
       }
-      const GraphData: NodeGraph = await this.getGraphData("/_search", myquery)
+      const GraphData: NodeGraph = await this.getGraphData(myquery)
       const frameMetaData: any = { preferredVisualizationType: 'nodeGraph' };
       const nodeFrame = new MutableDataFrame({
         name: 'Nodes',
@@ -69,24 +74,72 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
     return Promise.all(promises).then(data => ({ data: data[0] }));
   }
 
-  async getGraphData(url: string, q: QueryType): Promise<NodeGraph> {
+  async getGraphData(q: QueryType): Promise<NodeGraph> {
     const colors = ["blue", "green", "orange", "cyan"]
 
     let nodeGraph: NodeGraph = {
       nodes: [],
       edges: []
     }
+    let logs: Log[] = []
+    switch (this.backendName) {
+      case "ELASTICSEARCH":
 
-    const response = await this.request<ElasticsearchResponse>(url, q.APIquery);
 
-    const data: ElasticsearchResponse = response.data;
-    const logs: Log[] = data.hits.hits.map((item: Hits) => item._source)
+        const response = await this.request<ElasticsearchResponse>("/_search", `size=1000&pretty&q=${(q.Operation === "Process") ? 'TTY:pts0' : 'Operation=Network'}`);
+        const data: ElasticsearchResponse = response.data;
+        logs = data.hits.hits.map((item: Hits) => item._source)
+        break;
+      case "LOKI":
+
+        const resp = await this.request<LokiSearchResponse>("/loki/api/v1/query", `query={${(q.Operation === "Process") ? 'body_TTY="pts0"' : 'body_Operation="Network"'}}|json`);
+        const Lokidata: LokiSearchResponse = resp.data;
+        logs = Lokidata.Data.result.map(i => {
+          const lokiLog: Log = {
+
+            UpdatedTime: i.stream.body_UpdatedTime,
+            ClusterName: i.stream.body_ClusterName,
+            HostName: i.stream.body_HostName,
+            NamespaceName: i.stream.body_NamespaceName,
+            Owner: {
+              ref: i.stream.body_Owner_Ref,
+              Name: i.stream.body_Owner_Name,
+              Namespace: i.stream.body_NamespaceName
+            },
+            PodName: i.stream.body_PodName,
+            Labels: i.stream.body_Labels,
+            ContainerID: i.stream.body_ContainerID,
+            ContainerName: i.stream.body_ContainerName,
+            ContainerImage: i.stream.body_ContainerImage,
+            ParentProcessName: i.stream.body_ParentProcessName,
+            ProcessName: i.stream.body_ProcessName,
+            HostPPID: Number(i.stream.body_HostPPID),
+            HostPID: Number(i.stream.body_HostPID),
+            PPID: Number(i.stream.body_PPID),
+            PID: Number(i.stream.body_PID),
+            UID: Number(i.stream.body_UID),
+            Type: i.stream.body_Type,
+            Source: i.stream.body_Source,
+            Operation: i.stream.body_Operation,
+            Resource: i.stream.body_Resource,
+            Data: i.stream.body_Data,
+            Result: i.stream.body_Result,
+            Cwd: i.stream.body_Cwd,
+            TTY: i.stream.body_TTY!,
+          }
+          return lokiLog
+        })
+        break;
+    }
+
+
     const filteredlogs = logs.filter(item => {
-      const isProcess = item.Operation === "Process"
+      // const isProcess = item.Operation === "Process"
+      const isCorrectOperation = q.Operation === item.Operation
       const isCorrectNamespace = (q.NamespaceQuery === "All") ? true : item.NamespaceName === q.NamespaceQuery
       const isCorrectLabel = (q.LabelQuery === "All") ? true : item.Labels === q.LabelQuery
 
-      return (item.TTY === "pts0" && isProcess && isCorrectNamespace && isCorrectLabel)
+      return (item.TTY === "pts0" && isCorrectOperation && isCorrectNamespace && isCorrectLabel)
     })
 
     let ContainerNodes: NodeFields[] = []
@@ -187,11 +240,12 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   }
 
   getDefaultQuery(_: CoreApp): Partial<MyQuery> {
+
     return DEFAULT_QUERY;
   }
 
   filterQuery(query: MyQuery): boolean {
-    return !!query.APIquery;
+    return !!query.Operation;
   }
 
 
@@ -209,14 +263,24 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
 
   async testDatasource() {
     const defaultErrorMessage = 'Cannot connect to API';
-
     try {
+      // let testUrl = '/ready'
+      // switch (this.backendName) {
+      //   case 'elasticsearch':
+      //     testUrl = '/_cluster/health'
+      //     break;
+      //   case 'loki':
+      //     testUrl = '/ready'
+      //     break;
+      //   default:
+      //     break;
+      // }
       const response = await this.request<HealthResponse>('/_cluster/health');
       if (response.status === 200) {
         return {
 
-          status: 'sucess',
-          message: `responses_clustername: ${response.data.cluster_name}`,
+          status: `response : ${response.data.cluster_name}`,
+          message: `response : ${response.data.cluster_name}`,
         };
       } else {
         return {

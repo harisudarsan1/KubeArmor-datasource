@@ -7,15 +7,15 @@ export interface MyQuery extends DataQuery, QueryType {
 
 export interface QueryType {
 
-  APIquery?: string;
   NamespaceQuery?: string;
   LabelQuery?: string;
+  Operation: string;
 }
 
 export const DEFAULT_QUERY: Partial<MyQuery> = {
-  APIquery: "size=1000&pretty&q=TTY:pts0",
   NamespaceQuery: "All",
-  LabelQuery: "All"
+  LabelQuery: "All",
+  Operation: "Process"
 };
 
 // export interface DataPoint {
@@ -32,7 +32,7 @@ export const DEFAULT_QUERY: Partial<MyQuery> = {
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
   path?: string;
-  backendName?: string;
+  backendName: string;
 }
 
 /**
@@ -140,8 +140,31 @@ export interface ElasticsearchResponse {
   };
 }
 
+export interface LokiSearchResponse {
+  status: string;
+  Data: {
+    resultType: "string";
+    result: LokiResults[];
+    stats: any;
+
+
+  }
+
+}
+interface LokiResults {
+  stream: Stream;
+  values: any;
+}
+// interface Value {
+//   0: string; // First element of array is a string
+//   1: {
+//     body: Log
+//   }; // Second element of array is a DataBody object
+// }
+
+
 export interface Log {
-  Timestamp: number;
+  Timestamp?: number;
   UpdatedTime: string;
   ClusterName: string;
   HostName: string;
@@ -187,3 +210,66 @@ export type HealthResponse = {
   active_shards_percent_as_number: number;
 };
 
+interface Stream {
+  body_ClusterName: string;
+  body_ContainerID: string;
+  body_ContainerImage: string;
+  body_ContainerName: string;
+  body_Cwd: string;
+  body_Data: string;
+  body_HostName: string;
+  body_HostPID: string;
+  body_HostPPID: string;
+  body_Labels: string;
+  body_NamespaceName: string;
+  body_Operation: string;
+  body_Owner_Name: string;
+  body_Owner_Namespace: string;
+  body_Owner_Ref: string;
+  body_PID: string;
+  body_PPID: string;
+  body_ParentProcessName: string;
+  body_PodName: string;
+  body_ProcessName: string;
+  body_Resource: string;
+  body_Result: string;
+  body_Source: string;
+  body_Type: string;
+  body_UID: string;
+  body_UpdatedTime: string;
+  body_TTY?: string;
+  exporter: string;
+}
+// export interface LokiBody {
+//
+//   ClusterName: string;
+//   ContainerID: string;
+//   ContainerImage: string;
+//   ContainerName: string;
+//   Cwd: string;
+//   Data: string;
+//   HostName: string;
+//   HostPID: number;
+//   HostPPID: number;
+//   Labels: string;
+//   NamespaceName: string;
+//   Operation: string;
+//   Owner: {
+//     Name: string;
+//     Namespace: string;
+//     Ref: string;
+//   };
+//   PID: number;
+//   PPID: number;
+//   ParentProcessName: string;
+//   PodName: string;
+//   ProcessName: string;
+//   Resource: string;
+//   Result: string;
+//   Source: string;
+//   Type: string;
+//   UID: number;
+//   UpdatedTime: string; // Assuming this is a timestamp
+//
+// }
+//

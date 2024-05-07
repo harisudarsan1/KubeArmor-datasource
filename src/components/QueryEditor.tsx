@@ -1,5 +1,5 @@
-import React, { ChangeEvent, } from 'react';
-import { InlineField, Input, Stack, Select } from '@grafana/ui';
+import React from 'react';
+import { InlineField, Stack, Select } from '@grafana/ui';
 import { QueryEditorProps, SelectableValue } from '@grafana/data';
 import { DataSource } from '../datasource';
 import { MyDataSourceOptions, MyQuery } from '../types';
@@ -14,11 +14,6 @@ export function QueryEditor({ query, onChange, onRunQuery, data }: Props) {
   // }
   // const [namespace, setNamespace] = useState<SelectableValue<string>[]>([Allselectable])
   // const [labels, setLabels] = useState<SelectableValue<string>[]>([Allselectable])
-  const onQueryTextChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange({ ...query, APIquery: event.target.value });
-
-    onRunQuery();
-  };
 
   const onQueryChange = (qname: string, type: string) => {
 
@@ -31,11 +26,13 @@ export function QueryEditor({ query, onChange, onRunQuery, data }: Props) {
 
         onChange({ ...query, LabelQuery: qname });
         break;
+      case "OPERATION":
+        onChange({ ...query, Operation: qname })
     }
     onRunQuery();
   }
 
-  const { APIquery, NamespaceQuery, LabelQuery } = query;
+  const { NamespaceQuery, LabelQuery, Operation } = query;
   const frame = data?.series[0];
   const Namespaces = frame?.fields.find(i => i.name === 'detail__NamespaceName')
 
@@ -78,18 +75,20 @@ export function QueryEditor({ query, onChange, onRunQuery, data }: Props) {
     return selectable
   })
 
+  const operationOptions: SelectableValue[] = [
+    {
+      label: "Process",
+      value: "Process",
+
+    },
+    {
+      label: "Network",
+      value: "Network"
+    }
+  ]
 
   return (
     <Stack gap={0}>
-      <InlineField label="queries" labelWidth={16} tooltip="Enter API queries">
-        <Input
-          id="query-editor-query-text"
-          onChange={onQueryTextChange}
-          value={APIquery || ''}
-          required
-          placeholder="api queries"
-        />
-      </InlineField>
       <InlineField label="namespace" labelWidth={16} tooltip="filter using Namespaces">
 
         <Select
@@ -109,6 +108,18 @@ export function QueryEditor({ query, onChange, onRunQuery, data }: Props) {
           value={LabelQuery || ''}
           onChange={v => {
             onQueryChange(v.value!, "LABEL")
+          }} />
+
+
+      </InlineField>
+
+      <InlineField label="Operation" labelWidth={16} >
+
+        <Select
+          options={operationOptions}
+          value={Operation || 'Process'}
+          onChange={v => {
+            onQueryChange(v.value!, "OPERATION")
           }} />
 
 
