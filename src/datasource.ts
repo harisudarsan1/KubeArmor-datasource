@@ -225,7 +225,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
         return {
 
           status: `response : ${response.data.number_of_nodes}`,
-          message: `response : ${response.data.number_of_nodes} clustername: ${response.data.cluster_name}`,
+          message: `response :  clustername: ${response.data.cluster_name}`,
         };
       } else {
         return {
@@ -382,34 +382,34 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
   let networkGraphs: NetworkGraph[] = []
 
 
-  const requiredFields = [
-    "ownertype",
-    "kprobe",
-    "domain",
-    "hostname",
-    "namespace",
-    "remoteip",
-    "port",
-    "protocol"
-  ];
+  // const requiredFields = [
+  //   "ownertype",
+  //   "kprobe",
+  //   "domain",
+  //   "hostname",
+  //   "namespace",
+  //   "remoteip",
+  //   "port",
+  //   "protocol"
+  // ];
+  //
+  // const filteredLogs = logs.filter(log => {
+  //   if (!log.Data || !log.Resource) {
+  //     return false;
+  //   }
+  //   const dataMap = extractData(log.Data);
+  //   const resourceMap = extractData(log.Resource);
+  //
+  //   const hasRequiredFields = requiredFields.every(field =>
+  //     dataMap.hasOwnProperty(field) || resourceMap.hasOwnProperty(field)
+  //   );
+  //
+  //   const hasOwnerFields = log.Owner && log.Owner.Name && log.Owner.Namespace;
+  //
+  //   return hasRequiredFields && hasOwnerFields;
+  // });
 
-  const filteredLogs = logs.filter(log => {
-    if (!log.Data || !log.Resource) {
-      return false;
-    }
-    const dataMap = extractData(log.Data);
-    const resourceMap = extractData(log.Resource);
-
-    const hasRequiredFields = requiredFields.every(field =>
-      dataMap.hasOwnProperty(field) || resourceMap.hasOwnProperty(field)
-    );
-
-    const hasOwnerFields = log.Owner && log.Owner.Name && log.Owner.Namespace;
-
-    return hasRequiredFields && hasOwnerFields;
-  });
-
-  filteredLogs.map(log => {
+  logs.map(log => {
     const dataMap = extractData(log.Data);
     const resourceMap = extractData(log.Resource);
 
