@@ -29,6 +29,48 @@ export const sampleNode_fields: FrameFieldType[] = [
 
 ]
 
+
+
+export const NetworkNodeframeFields: FrameFieldType[] = [
+  {
+    name: 'id',
+    type: 'string',
+    config: {}
+  },
+  {
+    name: 'title',
+    type: 'string',
+    config: {}
+  },
+  {
+    name: 'mainStat',
+    type: 'string',
+    config: {}
+  },
+  {
+    name: 'color',
+    type: 'string',
+    config: {}
+  },
+  // {
+  //   name: 'detail__PodServicename',
+  //   type: 'string',
+  //   config: {
+  //     displayName: 'PodServiceName'
+  //   }
+  // },
+  //
+  // {
+  //   name: 'detail__NamespaceName',
+  //   type: 'string',
+  //   config: {
+  //     displayName: 'Namespace'
+  //   }
+  // }
+
+
+]
+
 export const NodeframeFields: FrameFieldType[] = [
   {
     name: 'id',

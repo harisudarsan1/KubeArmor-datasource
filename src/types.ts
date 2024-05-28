@@ -12,6 +12,7 @@ export interface QueryType {
   Operation: string;
 }
 
+
 export const DEFAULT_QUERY: Partial<MyQuery> = {
   NamespaceQuery: "All",
   LabelQuery: "All",
@@ -46,6 +47,11 @@ export interface NodeGraph {
   nodes: NodeFields[];
   edges: EdgeFields[];
 
+}
+
+export interface NetworkNodeGraph {
+  nodes: NetworkNodeFields[];
+  edges: EdgeFields[];
 }
 
 export interface NodeFields extends KubeArmorLogs {
@@ -93,6 +99,19 @@ export interface KubeArmorLogs {
   detail__Cwd?: string;
   detail__TTY?: string;
 }
+
+export interface NetworkNodeFields {
+
+  id: string;
+  title?: string;
+  mainStat?: string;
+  color?: string;
+
+  detail__PodServicename?: string;
+  detail__NamespaceName?: string;
+
+}
+
 
 interface Podowner {
   ref: string;
@@ -240,6 +259,31 @@ interface Stream {
   body_TTY?: string;
   exporter: string;
 }
+
+
+export interface NetworkData {
+  networkType: string;
+
+  kprobe?: string;
+  domain?: string;
+  remoteIP?: string;
+  hostName?: string;
+  port?: string;
+  protocol?: string;
+}
+export interface NetworkGraph {
+  ndata: NetworkData;
+  id: string;
+  source: NodeFields;
+  target: NodeFields;
+}
+
+
+
+
+
+
+
 // export interface LokiBody {
 //
 //   ClusterName: string;
