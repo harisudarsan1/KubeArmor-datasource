@@ -382,6 +382,7 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
   let networkGraphs: NetworkGraph[] = []
 
 
+  const RequestCountMap: { [key: string]: number } = {};
   // const requiredFields = [
   //   "ownertype",
   //   "kprobe",
@@ -410,6 +411,8 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
   // });
 
   logs.map(log => {
+
+    const hasOwnerFields = log.Owner && log.Owner.Name && log.Owner.Namespace;
     const dataMap = extractData(log.Data);
     const resourceMap = extractData(log.Resource);
 
@@ -445,18 +448,24 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
 
     const Ownernode: NetworkNodeFields = {
       id: log.PodName + log.NamespaceName,
-      title: log.PodName,
-      mainStat: log.Operation,
+      title: hasOwnerFields ? log.Owner.Name : log.PodName,
+      mainStat: log.PodName,
       color: log.Result === "Permission denied" ? "red" : "white",
+      detail__PodServicename: log.PodName,
+      detail__NamespaceName: log.NamespaceName
     };
-    console.log("owner: ", Ownernode);
+
+    // console.log("owner: ", Ownernode);
 
     const Peernode: NetworkNodeFields = {
       id: podservicename + peernamespace,
       title: peerhostName,
       mainStat: podservicename,
       color: "white",
+      detail__PodServicename: podservicename,
+      detail__NamespaceName: peernamespace
     };
+
 
     switch (kprobeData) {
       case "tcp_accept":
@@ -468,6 +477,12 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
           target: Ownernode,
         };
         networkGraphs.push(networkGraph);
+        if (RequestCountMap[ID]) {
+          RequestCountMap[ID] += 1;
+        } else {
+          // If the ID is not in the object, add it with a count of 1
+          RequestCountMap[ID] = 1;
+        }
         break;
       case "tcp_connect":
         const ID1 = podservicename + log.PodName + port + peernamespace + protocol;
@@ -478,6 +493,12 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
           target: Peernode,
         };
         networkGraphs.push(networkGraph1);
+        if (RequestCountMap[ID1]) {
+          RequestCountMap[ID1] += 1;
+        } else {
+          // If the ID is not in the object, add it with a count of 1
+          RequestCountMap[ID1] = 1;
+        }
         break;
     }
   });
@@ -486,12 +507,14 @@ function getNetworkGraph(logs: Log[], q: QueryType) {
     networkNodes.push(item.source)
 
     networkNodes.push(item.target)
+    const count = (RequestCountMap[item.id] > 1) ? Math.round(RequestCountMap[item.id] / 2) : RequestCountMap[item.id]
 
     let edge: EdgeFields = {
       id: item.id,
       source: item.source.id,
       target: item.target.id,
-
+      mainStat: item.ndata.protocol + item.ndata.port!,
+      detail__Count: count.toString()
     }
     networkEdges.push(edge)
 

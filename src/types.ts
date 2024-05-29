@@ -125,6 +125,8 @@ export interface EdgeFields {
   id: string;
   source: string;
   target: string;
+  mainStat?: string;
+  detail__Count?: string;
 }
 
 

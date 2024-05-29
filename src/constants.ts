@@ -17,6 +17,22 @@ export const EdgeframeFields: FrameFieldType[] = [
     type: 'string',
     config: {}
   },
+
+  {
+    name: 'mainStat',
+    type: 'string',
+    config: {}
+  },
+
+  {
+    name: 'detail__Count',
+    type: 'string',
+    config: {
+
+      displayName: ' request Count'
+    }
+  },
+
 ]
 
 export const sampleNode_fields: FrameFieldType[] = [
@@ -52,21 +68,21 @@ export const NetworkNodeframeFields: FrameFieldType[] = [
     type: 'string',
     config: {}
   },
-  // {
-  //   name: 'detail__PodServicename',
-  //   type: 'string',
-  //   config: {
-  //     displayName: 'PodServiceName'
-  //   }
-  // },
-  //
-  // {
-  //   name: 'detail__NamespaceName',
-  //   type: 'string',
-  //   config: {
-  //     displayName: 'Namespace'
-  //   }
-  // }
+  {
+    name: 'detail__PodServicename',
+    type: 'string',
+    config: {
+      displayName: 'PodServiceName'
+    }
+  },
+
+  {
+    name: 'detail__NamespaceName',
+    type: 'string',
+    config: {
+      displayName: 'Namespace'
+    }
+  }
 
 
 ]
